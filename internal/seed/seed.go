@@ -16,8 +16,8 @@ func Run(db *gorm.DB) error {
 			Latitude:  55.751244,
 			Longitude: 37.618423,
 		},
-		OpenTime:  time.Date(0, 1, 1, 8, 0, 0, 0, time.UTC),
-		CloseTime: time.Date(0, 1, 1, 20, 0, 0, 0, time.UTC),
+		OpenTime:  "07:00:00",
+		CloseTime: "22:00:00",
 	}
 
 	wh2 := models.Warehouse{
@@ -27,8 +27,8 @@ func Run(db *gorm.DB) error {
 			Latitude:  59.934280,
 			Longitude: 30.335098,
 		},
-		OpenTime:  time.Date(0, 1, 1, 9, 0, 0, 0, time.UTC),
-		CloseTime: time.Date(0, 1, 1, 21, 0, 0, 0, time.UTC),
+		OpenTime:  "08:00:00",
+		CloseTime: "21:00:00",
 	}
 
 	dp1 := models.DeliveryPoint{
@@ -37,8 +37,8 @@ func Run(db *gorm.DB) error {
 			Latitude:  55.7601,
 			Longitude: 37.6185,
 		},
-		OpenTime:  time.Date(0, 1, 1, 10, 0, 0, 0, time.UTC),
-		CloseTime: time.Date(0, 1, 1, 19, 0, 0, 0, time.UTC),
+		OpenTime:  "08:00:00",
+		CloseTime: "20:00:00",
 		IsActive:  true,
 	}
 
@@ -48,8 +48,8 @@ func Run(db *gorm.DB) error {
 			Latitude:  59.9386,
 			Longitude: 30.3141,
 		},
-		OpenTime:  time.Date(0, 1, 1, 11, 0, 0, 0, time.UTC),
-		CloseTime: time.Date(0, 1, 1, 20, 0, 0, 0, time.UTC),
+		OpenTime:  "08:00:00",
+		CloseTime: "21:00:00",
 		IsActive:  true,
 	}
 
@@ -59,8 +59,8 @@ func Run(db *gorm.DB) error {
 			Latitude:  56.837,
 			Longitude: 60.597,
 		},
-		OpenTime:  time.Date(0, 1, 1, 9, 30, 0, 0, time.UTC),
-		CloseTime: time.Date(0, 1, 1, 18, 30, 0, 0, time.UTC),
+		OpenTime:  "10:00:00",
+		CloseTime: "20:00:00",
 		IsActive:  false,
 	}
 

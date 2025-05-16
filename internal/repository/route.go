@@ -6,7 +6,6 @@ import (
 	"routecore/pkg/db"
 )
 
-
 type RouteSegmentRepository struct {
 	Database *db.Db
 }
@@ -17,11 +16,11 @@ func NewRouteSegmentRepository(database *db.Db) *RouteSegmentRepository {
 	}
 }
 
-func (repo *RouteSegmentRepository) FindActual(query dto.RouteSegmentDto) (*models.RouteSegment,error) {
+func (repo *RouteSegmentRepository) FindActual(query dto.RouteSegmentDto) (*models.RouteSegment, error) {
 	var segment models.RouteSegment
 	err := repo.Database.DB.
-		Where("from = ? AND to = ?", query.FromID, query.ToID).
-		Where("departure >= ? AND arrival <= ?", query.EarliestDeparture, query.LatestArrival).
+		Where(`"from" = ? AND "to" = ?`, query.FromID, query.ToID).
+		Where(`CAST(departure AS time) >= ? AND CAST(arrival AS time) <= ?`, query.EarliestDeparture, query.LatestArrival).
 		First(&segment).Error
 
 	if err != nil {

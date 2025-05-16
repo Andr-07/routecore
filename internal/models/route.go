@@ -23,7 +23,7 @@ type RouteSegment struct {
 	ID          uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	RouteID     uuid.UUID `gorm:"type:uuid;not null;index"`
 	TransportID uuid.UUID `gorm:"type:uuid;not null"`
-	From        uuid.UUID `gorm:"type:uuid;not null"`
+    From        uuid.UUID `gorm:"column:from;type:uuid;not null"`
 	To          uuid.UUID `gorm:"type:uuid;not null"`
 	Departure   time.Time `gorm:"not null"`
 	Arrival     time.Time `gorm:"not null"`
