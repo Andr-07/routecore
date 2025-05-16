@@ -2,19 +2,39 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"routecore/configs"
-	"routecore/internal/db"
-	"routecore/internal/seed"
+	"routecore/internal/repository"
+	"routecore/internal/route_calculate"
+	"routecore/pkg/db"
 )
 
 func main() {
 	conf := configs.LoadConfig()
-	database := db.NewDb(&conf.Db)
+	db := db.NewDb(&conf.Db)
+	router := http.NewServeMux()
 
+	// Repositories
+	deliveryPointRepository := repository.NewDeliveryPointRepository(db)
+	routeSegmentRepository := repository.NewRouteSegmentRepository(db)
+	warehouseRepository := repository.NewWarehouseRepository(db)
 
-	if err := seed.Run(database.DB); err != nil {
-		log.Fatalf("Seed error: %v", err)
+	// Services
+	routeCalculateService := route_calculate.NewRouteCalculateService(
+		deliveryPointRepository,
+		routeSegmentRepository,
+		warehouseRepository,
+	)
+
+	// Handlers
+	route_calculate.NewRouteCalculateHandler(router, route_calculate.RouteCalculateHandlerDeps{
+		Config:                conf,
+		RouteCalculateService: routeCalculateService,
+	})
+
+	log.Println("Server started on :8080")
+	err := http.ListenAndServe(":8080", router)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
 	}
-
-	log.Println("Seeding completed successfully!")
 }
