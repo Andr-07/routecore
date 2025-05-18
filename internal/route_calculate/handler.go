@@ -2,8 +2,10 @@ package route_calculate
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"routecore/configs"
+	"routecore/internal/events"
 	"routecore/internal/models"
 	"routecore/pkg/validation"
 
@@ -13,19 +15,23 @@ import (
 type RouteCalculateHandlerDeps struct {
 	*configs.Config
 	*RouteCalculateService
+	*events.EventProducer
 }
 
 type RouteCalculateHandler struct {
 	*configs.Config
 	*RouteCalculateService
+	*events.EventProducer
 }
 
 func NewRouteCalculateHandler(router *http.ServeMux, deps RouteCalculateHandlerDeps) {
 	handler := &RouteCalculateHandler{
 		Config:                deps.Config,
 		RouteCalculateService: deps.RouteCalculateService,
+		EventProducer:         deps.EventProducer,
 	}
-	router.HandleFunc("POST /route/calculate", handler.Calculate())
+	router.HandleFunc("POST /routes/calculate", handler.Calculate())
+	router.HandleFunc("GET /routes", handler.GetAll())
 
 }
 
@@ -50,6 +56,13 @@ func (handler *RouteCalculateHandler) Calculate() http.HandlerFunc {
 			Segments:     []models.RouteSegment{*segment},
 		}
 
+		go func() {
+			err := handler.EventProducer.SendRouteCreated(route.ID, route.Segments)
+			if err != nil {
+				log.Println("❌ Kafka route_created error:", err)
+			}
+		}()
+
 		resp := RouteResponse{
 			ID:           route.ID,
 			From:         route.From,
@@ -59,6 +72,25 @@ func (handler *RouteCalculateHandler) Calculate() http.HandlerFunc {
 			Segments:     route.Segments,
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		if err := json.NewEncoder(w).Encode(resp); err != nil {
+			http.Error(w, "failed to encode response", http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func (handler *RouteCalculateHandler) GetAll() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		segments, err := handler.RouteCalculateService.GetAll()
+		if err != nil {
+			http.Error(w, "failed to fetch routes", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(segments); err != nil {
+			http.Error(w, "failed to encode response", http.StatusInternalServerError)
+			return
+		}
 	}
 }

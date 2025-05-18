@@ -1,10 +1,18 @@
 package repository
 
 import (
-	"routecore/internal/dto"
 	"routecore/internal/models"
 	"routecore/pkg/db"
+
+	"github.com/google/uuid"
 )
+
+type RouteSegmentDto struct {
+	FromID            uuid.UUID 
+	ToID              uuid.UUID 
+	EarliestDeparture string
+	LatestArrival     string
+}
 
 type RouteSegmentRepository struct {
 	Database *db.Db
@@ -16,7 +24,7 @@ func NewRouteSegmentRepository(database *db.Db) *RouteSegmentRepository {
 	}
 }
 
-func (repo *RouteSegmentRepository) FindActual(query dto.RouteSegmentDto) (*models.RouteSegment, error) {
+func (repo *RouteSegmentRepository) FindActual(query RouteSegmentDto) (*models.RouteSegment, error) {
 	var segment models.RouteSegment
 	err := repo.Database.DB.
 		Where(`"from" = ? AND "to" = ?`, query.FromID, query.ToID).
@@ -28,4 +36,13 @@ func (repo *RouteSegmentRepository) FindActual(query dto.RouteSegmentDto) (*mode
 	}
 
 	return &segment, nil
+}
+
+func (repo *RouteSegmentRepository) FindAll() ([]models.RouteSegment, error) {
+	var segments []models.RouteSegment
+	err := repo.Database.DB.Find(&segments).Error
+	if err != nil {
+		return nil, err
+	}
+	return segments, nil
 }

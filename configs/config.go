@@ -32,7 +32,7 @@ func LoadConfig() *Config {
 		},
 		Kafka: KafkaConfig{
 			Broker: os.Getenv("KAFKA_BROKER"),
-			Topic: "logs",
+			Topic: os.Getenv("KAFKA_TOPIC"),
 		},
 	}
 }

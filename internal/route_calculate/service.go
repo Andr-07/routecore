@@ -1,7 +1,6 @@
 package route_calculate
 
 import (
-	"routecore/internal/dto"
 	"routecore/internal/models"
 	"routecore/internal/repository"
 
@@ -37,7 +36,7 @@ func (service *RouteCalculateService) Calculate(from, to uuid.UUID) (*models.Rou
 		return nil, err
 	}
 
-	dto := dto.RouteSegmentDto{
+	dto := repository.RouteSegmentDto{
 		FromID:            warehouse.ID,
 		ToID:              deliveryPoint.ID,
 		EarliestDeparture: warehouse.OpenTime,
@@ -50,4 +49,13 @@ func (service *RouteCalculateService) Calculate(from, to uuid.UUID) (*models.Rou
 	}
 
 	return segment, nil
+}
+
+func (service *RouteCalculateService) GetAll() ([]models.RouteSegment, error) {
+	segments, err := service.RouteSegmentRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	return segments, nil
 }
